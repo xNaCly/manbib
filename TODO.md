@@ -6,4 +6,5 @@
    | id | path | title | description | type | text | preview | examples | history |
    | -- | ---- | ----- | ----------- | ---- | ---- | ------- | -------- | ------- |
 4. create web interface
+   - add tab for last searches
 5. add search to web interface
