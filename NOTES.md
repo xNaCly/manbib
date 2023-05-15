@@ -9,3 +9,7 @@
 7.  Miscellaneous (including macro packages and conventions), e.g. man(7), groff(7), man-pages(7)
 8.  System administration commands (usually only for root)
 9.  Kernel routines [Non standard]
+
+## roff parsing:
+
+- `man groff_man` <- gnu roff man dialect
