@@ -1,9 +1,9 @@
 # TODO
 
 - [x] search all local manpages
-- [ ] convert man page to html via pandoc
-- [ ] store text tokens in db:
-- [ ] index manpages in a sqlite db:
+- [x] convert man page to html via pandoc
+- [x] store text tokens in db:
+- [x] index manpages in a sqlite db:
 
   | id  | path | name | preview | examples | history |
   | --- | ---- | ---- | ------- | -------- | ------- |

@@ -1,11 +1,38 @@
-## Section numbers
+## Performance issues
 
-1.  Executable programs or shell commands
-2.  System calls (functions provided by the kernel)
-3.  Library calls (functions within program libraries)
-4.  Special files (usually found in /dev)
-5.  File formats and conventions, e.g. /etc/passwd
-6.  Games
-7.  Miscellaneous (including macro packages and conventions), e.g. man(7), groff(7), man-pages(7)
-8.  System administration commands (usually only for root)
-9.  Kernel routines [Non standard]
+### Problem
+
+Only indexing in a for loop without any goroutines is extremely slow.
+Creating a goroutine for each file does not work due to the fact that my system already has 25k man files and go limits go routines to 10k.
+
+```
+manbib master M $ go run . i
+2023/05/16 14:57:43 starting index creation, this may take a while
+2023/05/16 14:57:43 found 24362 man pages, starting indexing
+2023/05/16 15:04:06 processed file: [24361/24362] 100.00 %
+2023/05/16 15:04:06 done, took:  6m22.497429392s
+```
+
+To fix this i have to somehow split up the workload onto all the available go routines, because 6minutes is unacceptable.
+
+Assume input `n = 24361` and available routines `g = 9000`.
+By simply dividing `n` by `g`, we can calculate how many files every gorouting should process - `n / g = nPg`, where `nPg` means `n` per `g`.
+
+### Python poc:
+
+```python
+import math
+
+n = 24362
+t = 9000
+
+li = 0
+i = 0
+
+nPt = math.ceil( n / t)
+while i < n:
+    print(f"{li}->{i}")
+    li = i
+    i += nPt
+print("nPt",nPt)
+```
