@@ -1,6 +1,6 @@
 # manbib
 
-> A library for indexing, searching and viewing locally installed man pages via a webinterface. It also supports usage examples and past usages via tldr and the shell history.
+Index, search and view locally installed man pages via a web interface. It also supports usage examples and past usages via tldr and the shell history. 
 
 ## Setup
 
