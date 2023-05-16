@@ -3,19 +3,26 @@ package cli
 import (
 	"fmt"
 	"log"
+	"path"
 
 	"github.com/xnacly/manbib/indexer"
+	"github.com/xnacly/manbib/shared"
 )
 
 func Index() {
-	log.Println("starting indexing, this can take a while")
+	log.Println("starting index creation, this may take a while")
 	p := indexer.Lookup()
 	l := len(p)
+	log.Printf("found %d man pages, starting indexing", l)
 	fmt.Println()
-	for i, v := range p {
+	templatePath := path.Join(shared.ConfigHome(), "template.html5")
+	processedFiles := 0
+
+	// this is extremly slow, split this up into around 9k areas and spawn a goroutine for each section
+	for _, v := range p {
 		fmt.Print("\033[1A\033[K")
-		log.Printf("[%d/%d] starting thread for file. %s\n", i+1, l, v)
-		// pass file to lexer, parser and code generator
+		log.Printf("processed file: [%d/%d]\n", processedFiles, l)
+		indexer.Index(v, templatePath)
+		processedFiles++
 	}
-	// fill this into the database
 }
