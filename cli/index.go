@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"path"
+	"time"
 
 	"github.com/xnacly/manbib/indexer"
 	"github.com/xnacly/manbib/shared"
@@ -16,13 +17,13 @@ func Index() {
 	log.Printf("found %d man pages, starting indexing", l)
 	fmt.Println()
 	templatePath := path.Join(shared.ConfigHome(), "template.html5")
-	processedFiles := 0
 
 	// this is extremly slow, split this up into around 9k areas and spawn a goroutine for each section
-	for _, v := range p {
+	start := time.Now()
+	for i, v := range p {
 		fmt.Print("\033[1A\033[K")
-		log.Printf("processed file: [%d/%d]\n", processedFiles, l)
+		log.Printf("processed file: [%d/%d] %.2f %%\n", i, l, (float64(i)/float64(l))*100.0)
 		indexer.Index(v, templatePath)
-		processedFiles++
 	}
+	log.Println("done, took: ", time.Since(start))
 }
