@@ -1,11 +1,19 @@
 package indexer
 
 import (
+	"fmt"
 	"io/fs"
+	"os/exec"
+	"path"
 	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/xnacly/manbib/database"
+	"github.com/xnacly/manbib/shared"
 )
 
-const MAN_PATH = "/usr/share/man"
+var MAN_PATH = "/usr/share/man/"
 
 // queries the system for available man pages,
 func Lookup() (r []string) {
@@ -17,4 +25,16 @@ func Lookup() (r []string) {
 		return nil
 	})
 	return
+}
+
+func Index(p string, templatePath string) {
+	pandocCmd := fmt.Sprintf("zcat %s | pandoc --from man --to markdown | pandoc --toc --from markdown --to html5 --template %s", p, templatePath)
+	manPreview, _ := exec.Command("bash", "-c", pandocCmd).Output()
+	cmdName := strings.Replace(path.Base(p), ".gz", "", 1)
+	database.DB.InsertPage(shared.Page{
+		Name:        cmdName,
+		Path:        p,
+		Preview:     string(manPreview),
+		LastUpdated: time.Now(),
+	})
 }
