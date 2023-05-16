@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	cli.Check()
 	if len(os.Args) == 1 {
 		cli.StartWeb()
 		return
