@@ -15,6 +15,9 @@ import (
 	"github.com/xnacly/manbib/shared"
 )
 
+//go:embed style.css
+var style []byte
+
 //go:embed index.html
 var index string
 var tpl = template.Must(template.New("index.html").Parse(index))
