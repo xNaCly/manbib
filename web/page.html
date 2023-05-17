@@ -1,0 +1,41 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {{ if .Name }} manbib - {{ .Name }} {{ end }} {{ if not .Name }} manbib -
+      404 {{ end }}
+    </title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="/">Home</a>
+      </header>
+      <div class="page-preview-container">
+        <div class="card page-full">
+          <h1>{{ .Name }}</h1>
+          <details class="card">
+            <summary>Examples</summary>
+            {{ .Examples }}
+          </details>
+          <div class="card page-preview">
+            <h2>Man page:</h2>
+            {{ .Preview }}
+          </div>
+          <table>
+            <tr>
+              <td>Last Updated</td>
+              <td>{{ .LastUpdated }}</td>
+            </tr>
+            <tr>
+              <td>Location</td>
+              <td>{{ .Path }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
