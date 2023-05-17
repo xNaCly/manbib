@@ -18,7 +18,7 @@ func Index() {
 	fmt.Println()
 	templatePath := path.Join(shared.ConfigHome(), "template.html5")
 
-	// this is extremly slow, split this up into around 9k areas and spawn a goroutine for each section
+	// TODO: this is extremly slow, split this up into around 9k areas and spawn a goroutine for each section
 	start := time.Now()
 	for i, v := range p {
 		fmt.Print("\033[1A\033[K")
