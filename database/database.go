@@ -23,7 +23,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"path"
 
@@ -75,7 +74,6 @@ func (d *Database) InsertPage(p shared.Page) {
 
 // queries the database with the given name via a WHERE name LIKE  statement
 func (d *Database) GetPages(name string, limit int) []shared.Page {
-	log.Printf("[DB]: querying pages table with '%s', limited to %d entries", name, limit)
 	var rows *sql.Rows
 	var err error
 	if limit < 0 {
@@ -88,13 +86,13 @@ func (d *Database) GetPages(name string, limit int) []shared.Page {
 	}
 	res := make([]shared.Page, 0)
 	if err != nil {
+		log.Println(err)
 		return res
 	}
 	for rows.Next() {
 		r := shared.Page{}
 		err = rows.Scan(&r.Path, &r.Name, &r.Preview, &r.LastUpdated)
 		if err != nil {
-			fmt.Println("hit:", err)
 			continue
 		}
 		res = append(res, r)
@@ -115,6 +113,12 @@ func (d *Database) GetPagesAmount() (int, error) {
 func (d *Database) GetRandomPage() (shared.Page, error) {
 	row := d.Conn.QueryRow("SELECT path, name, preview, last_updated FROM pages ORDER BY RANDOM() LIMIT 1")
 	r := shared.Page{}
+
+	// FIXES: errors if the result set is empty
+	if row == nil {
+		return shared.Page{}, nil
+	}
+
 	err := row.Scan(&r.Path, &r.Name, &r.Preview, &r.LastUpdated)
 	if err != nil {
 		return shared.Page{}, err
