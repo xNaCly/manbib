@@ -10,3 +10,12 @@ type Page struct {
 	History     string
 	LastUpdated time.Time
 }
+
+type SearchTemplateContent struct {
+	Query        string
+	Rows         []Page
+	ResultAmount int
+	Latency      string
+	Total        int
+	Page         Page
+}
