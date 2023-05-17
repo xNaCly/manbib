@@ -18,7 +18,7 @@ $body$
 `
 
 var DEPENDENCIES = []string{
-	"pandoc",
+	"man",
 	"zcat",
 }
 
