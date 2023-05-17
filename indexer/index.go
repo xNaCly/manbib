@@ -28,7 +28,8 @@ func Lookup() (r []string) {
 }
 
 func Index(p string, templatePath string) {
-	pandocCmd := fmt.Sprintf("zcat %s | pandoc --from man --to markdown | pandoc --toc --from markdown --to html5 --template %s", p, templatePath)
+	// pandocCmd := fmt.Sprintf("zcat %s | pandoc --from man --to markdown | pandoc --toc --from markdown --to html5 --template %s", p, templatePath)
+	pandocCmd := fmt.Sprintf("zcat %s | pandoc --from man --to html", p)
 	manPreview, _ := exec.Command("bash", "-c", pandocCmd).Output()
 	cmdName := strings.Replace(path.Base(p), ".gz", "", 1)
 	database.DB.InsertPage(shared.Page{
