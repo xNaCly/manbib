@@ -74,13 +74,17 @@ func (d *Database) InsertPage(p shared.Page) {
 }
 
 // queries the database with the given name via a WHERE name LIKE  statement
-func (d *Database) GetPages(name string) []shared.Page {
+func (d *Database) GetPages(name string, limit int) []shared.Page {
+	log.Printf("[DB]: querying pages table with '%s', limited to %d entries", name, limit)
 	var rows *sql.Rows
 	var err error
+	if limit < 0 {
+		limit = 1
+	}
 	if len(name) != 0 {
-		rows, err = d.Conn.Query("SELECT path, name, preview, last_updated FROM pages WHERE name LIKE ?", name)
+		rows, err = d.Conn.Query("SELECT path, name, preview, last_updated FROM pages WHERE name LIKE ? LIMIT ?", name, limit)
 	} else {
-		rows, err = d.Conn.Query("SELECT path, name, preview, last_updated FROM pages")
+		rows, err = d.Conn.Query("SELECT path, name, preview, last_updated FROM pages LIMIT ?", limit)
 	}
 	res := make([]shared.Page, 0)
 	if err != nil {
