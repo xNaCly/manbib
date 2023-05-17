@@ -5,6 +5,8 @@
 Only indexing in a for loop without any goroutines is extremely slow.
 Creating a goroutine for each file does not work due to the fact that my system already has 25k man files and go limits go routines to 10k.
 
+Without creating a preview via pandoc:
+
 ```
 manbib master M $ go run . i
 2023/05/16 14:57:43 starting index creation, this may take a while
@@ -14,6 +16,15 @@ manbib master M $ go run . i
 ```
 
 To fix this i have to somehow split up the workload onto all the available go routines, because 6minutes is unacceptable.
+
+With a fewer pages and creating a preview with pandoc:
+
+```
+2023/05/17 08:32:49 starting index creation, this may take a while
+2023/05/17 08:32:49 found 904 man pages, starting indexing
+2023/05/17 08:35:45 processed file: [903/904] 99.89 %
+2023/05/17 08:35:45 done, took:  2m56.304404478s
+```
 
 Assume input `n = 24361` and available routines `g = 9000`.
 By simply dividing `n` by `g`, we can calculate how many files every gorouting should process - `n / g = nPg`, where `nPg` means `n` per `g`.
