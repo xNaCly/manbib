@@ -101,3 +101,23 @@ func (d *Database) GetPages(name string, limit int) []shared.Page {
 	}
 	return res
 }
+
+func (d *Database) GetPagesAmount() (int, error) {
+	row := d.Conn.QueryRow("SELECT COUNT(*) as p FROM pages")
+	var p int
+	err := row.Scan(&p)
+	if err != nil {
+		return 0, err
+	}
+	return p, nil
+}
+
+func (d *Database) GetRandomPage() (shared.Page, error) {
+	row := d.Conn.QueryRow("SELECT path, name, preview, last_updated FROM pages ORDER BY RANDOM() LIMIT 1")
+	r := shared.Page{}
+	err := row.Scan(&r.Path, &r.Name, &r.Preview, &r.LastUpdated)
+	if err != nil {
+		return shared.Page{}, err
+	}
+	return r, nil
+}
