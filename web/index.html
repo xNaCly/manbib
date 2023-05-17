@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>manbib {{ if .Query }} - {{ .Query }} {{ end }}</title>
+    <style>
+      :root {
+        --bg: #080808;
+        --bg-sec: #323437;
+        --fg: #b2b2b2;
+        --p: #74b2ff;
+        --p-sec: #80a0ff;
+        --txt: #fff;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #fff;
+          --fg: #080808;
+          --bg-sec: #e4e4e4;
+          --txt: #080808;
+          --p: #74b2ff;
+          --p-sec: #80a0ff;
+        }
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+      }
+      input {
+        background: var(--bg-sec);
+        border: none;
+        border-radius: 0.25rem;
+        padding: 0.25rem;
+        color: var(--txt);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      main {
+        margin: 2rem 2rem;
+      }
+      a {
+        color: var(--p);
+        text-decoration: none;
+      }
+      a:visited {
+        color: var(--p-sec);
+      }
+      .page-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        border-radius: 0.25rem;
+        border: 1px solid var(--bg-sec);
+        padding: 0.5rem;
+        margin: 0.5rem;
+      }
+      .page h3 {
+        color: var(--txt);
+        margin-bottom: 0.25rem;
+        margin-top: 0.25rem;
+      }
+      .welcome {
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="/">Home</a>
+        <form action="/search" method="GET">
+          <input
+            class="query"
+            value="{{if .Query }}{{ .Query }}{{ end }}"
+            placeholder="man page search"
+            type="search"
+            name="q"
+          />
+        </form>
+      </header>
+      <div class="welcome">
+        {{ if .Total }}
+        <h3>Random man-page:</h3>
+        <div class="page-container">
+          <div class="page">
+            <h3><a href="/page?p={{ .Page.Name }}">{{ .Page.Name }}</a></h3>
+            <small>{{ .Page.Path }}</small>
+            <small>last updated: {{ .Page.LastUpdated }}</small>
+          </div>
+        </div>
+        <div><i>Indexed {{ .Total }} man pages.</i></div>
+        {{ end }}
+      </div>
+      <div>
+        {{ if .Query}}
+        <p>
+          {{.ResultAmount}} results for <b>{{.Query}}</b>, took: {{.Latency}}
+        </p>
+        <div class="page-container">
+          {{ range.Rows }}
+          <div class="page">
+            <h3><a href="/page?p={{ .Name }}">{{ .Name }}</a></h3>
+            <small>{{ .Path }}</small>
+            <small>last updated: {{ .LastUpdated }}</small>
+          </div>
+          {{ end }}
+        </div>
+        {{ end }}
+      </div>
+      <!-- TODO: implement preview page -->
+      <div class="page-preview">{{ if .Preview }} {{.Preview}} {{ end }}</div>
+    </main>
+  </body>
+</html>
