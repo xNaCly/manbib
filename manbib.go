@@ -19,6 +19,7 @@ func main() {
 		return
 	}
 
+	// TODO: remove index cmd, index when user starts webfrontend
 	cmd := os.Args[1]
 	switch cmd {
 	case "index", "i":

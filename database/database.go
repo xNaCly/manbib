@@ -20,6 +20,7 @@
 package database
 
 // TODO: add shared.Page.Examples & shared.Page.History
+// Examples from tldr, History from default shell ($SHELL)
 
 import (
 	"database/sql"
