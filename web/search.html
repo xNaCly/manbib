@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>manbib - Home</title>
+    <title>manbib - "{{ .Query }}"</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
@@ -13,23 +13,27 @@
           <a href="/">Home</a>
           <input
             class="query"
-            value=""
+            value="{{ .Query }}"
             placeholder="man page search"
             type="search"
             name="q"
           />
         </form>
       </header>
-      <div class="welcome">
-        {{ if .Total }}
-        <h3>Random man-page:</h3>
+      <div>
+        {{ if .Query}}
+        <p>
+          {{.ResultAmount}} results for <b>{{.Query}}</b>, took: {{.Latency}}
+        </p>
         <div class="page-container">
+          {{ range.Rows }}
           <div class="page">
-            <h3><a href="/page?p={{ .Page.Name }}">{{ .Page.Name }}</a></h3>
-            <small>{{ .Page.Path }}</small>
+            <h3><a href="/page?p={{ .Name }}">{{ .Name }}</a></h3>
+            <small>{{ .Path }}</small>
+            <small>last updated: {{ .LastUpdated }}</small>
           </div>
+          {{ end }}
         </div>
-        <div><i>Indexed {{ .Total }} man pages.</i></div>
         {{ end }}
       </div>
       <footer>
