@@ -58,25 +58,28 @@ func (d *Database) ClearDatabase() {
 	d.Conn.Exec("DROP TABLE pages")
 }
 
+// updates the preview of the page with the given path
+func (d *Database) UpdatePreview(path string, preview []byte) error {
+	_, err := d.Conn.Exec("UPDATE pages SET preview = ? WHERE path = ?", preview, path)
+	return err
+}
+
 // inserts the given page in the pages table of the database
-func (d *Database) InsertPages(p []shared.Page) {
+func (d *Database) InsertPages(p []shared.Page) error {
 	t, err := d.Conn.Begin()
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	for _, page := range p {
 		_, err := t.Exec("INSERT INTO pages (path, name, preview, last_updated) VALUES(?, ?, ?, ?)", page.Path, page.Name, page.Preview, page.LastUpdated)
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
 	}
+
 	err = t.Commit()
-	if err != nil {
-		log.Println(err)
-	}
+	return err
 }
 
 // queries the database with the given name via a WHERE name LIKE  statement

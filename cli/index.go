@@ -34,6 +34,9 @@ func Index() {
 			LastUpdated: start,
 		})
 	}
-	database.DB.InsertPages(r)
+	err := database.DB.InsertPages(r)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	log.Println("done, took: ", time.Since(start))
 }
