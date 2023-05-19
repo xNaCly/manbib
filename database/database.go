@@ -5,13 +5,6 @@
 //
 //	database.DB = database.Setup()
 //
-//	database.DB.InsertPage(shared.Page{
-//	    Path:        "/usr/share/man/man1/ls.1.gz",
-//	    Name:        "ls",
-//	    Preview:     "lool ls",
-//	    LastUpdated: time.Now(),
-//	})
-//
 //	r, _ := json.MarshalIndent(database.DB.GetPages("%ls%"), "", "\t")
 //	fmt.Println(string(r))
 //	database.DB.ClearDatabase()
@@ -66,10 +59,23 @@ func (d *Database) ClearDatabase() {
 }
 
 // inserts the given page in the pages table of the database
-func (d *Database) InsertPage(p shared.Page) {
-	_, err := d.Conn.Exec("INSERT INTO pages (path, name, preview, last_updated) VALUES(?, ?, ?, ?)", p.Path, p.Name, p.Preview, p.LastUpdated)
+func (d *Database) InsertPages(p []shared.Page) {
+	t, err := d.Conn.Begin()
 	if err != nil {
+		log.Println(err)
 		return
+	}
+
+	for _, page := range p {
+		_, err := t.Exec("INSERT INTO pages (path, name, preview, last_updated) VALUES(?, ?, ?, ?)", page.Path, page.Name, page.Preview, page.LastUpdated)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+	err = t.Commit()
+	if err != nil {
+		log.Println(err)
 	}
 }
 
