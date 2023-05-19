@@ -18,8 +18,7 @@ $body$
 `
 
 var DEPENDENCIES = []string{
-	"man",
-	"zcat",
+	"pandoc",
 }
 
 func Check() {
@@ -27,8 +26,8 @@ func Check() {
 		log.Fatalln("manbib only supports linux")
 	}
 	for _, d := range DEPENDENCIES {
-		_, err := exec.LookPath(d)
-		if err != nil {
+		res, err := exec.LookPath(d)
+		if err != nil || len(res) == 0 {
 			log.Fatalf("'%s' executable not found, please check its install.", d)
 		}
 	}
@@ -51,7 +50,6 @@ func ConfigHome() string {
 
 	tPath := path.Join(p, "template.html5")
 	_, err = os.Stat(tPath)
-
 	if err != nil {
 		err := os.WriteFile(tPath, []byte(HTML_TEMPLATE), os.ModePerm)
 		if err != nil {
