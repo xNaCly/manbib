@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os/exec"
+	"path"
 	"strconv"
 	"text/template"
 	"time"
@@ -24,7 +26,11 @@ var tpl = template.Must(template.New("index.html").Parse(indexTemplate))
 
 //go:embed page.html
 var pageTemplate string
-var tplPage = template.Must(template.New("page.html").Parse(pageTemplate))
+var pageTpl = template.Must(template.New("page.html").Parse(pageTemplate))
+
+//go:embed search.html
+var searchTemplate string
+var searchTpl = template.Must(template.New("search.html").Parse(searchTemplate))
 
 func Run() {
 	mux := http.NewServeMux()
@@ -52,8 +58,8 @@ func Run() {
 		// this keeps everything neat and simple
 		// https://open.spotify.com/track/3koCCeSaVUyrRo3N2gHrd8
 		// if err != nil {
-		//  http.Error(w, err.Error(), http.StatusInternalServerError)
-		//  return
+		// http.Error(w, err.Error(), http.StatusInternalServerError)
+		// return
 		// }
 		buf.WriteTo(w)
 	})
@@ -97,10 +103,12 @@ func search(w http.ResponseWriter, r *http.Request) {
 		Latency:      time.Since(start).String(),
 	}
 	buf := &bytes.Buffer{}
-	err = tpl.Execute(buf, s)
+	err = searchTpl.Execute(buf, s)
 	buf.WriteTo(w)
 }
 
+// TODO: do this on the fly, if a user opens the manpage, convert it to html
+// TODO: override the preview in the database, not only here
 func page(w http.ResponseWriter, r *http.Request) {
 	url, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -111,11 +119,22 @@ func page(w http.ResponseWriter, r *http.Request) {
 	params := url.Query()
 	reqPage := params.Get("p")
 	page := database.DB.GetPages(reqPage, 1)
+	templatePath := path.Join(shared.ConfigHome(), "template.html5")
 	if len(page) < 1 {
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
+	p := page[0]
+	if len(p.Preview) == 0 {
+		cmd := exec.Command("bash", "-c", fmt.Sprintf("zcat %s | pandoc --from man --to markdown | pandoc --toc --from markdown --to html5 --template %s", p.Path, templatePath))
+		manPreview, err := cmd.Output()
+		if err != nil {
+			log.Println(err, string(manPreview), cmd.String())
+		}
+		p.Preview = string(manPreview)
+	}
+
 	buf := &bytes.Buffer{}
-	err = tplPage.Execute(buf, page[0])
+	err = pageTpl.Execute(buf, p)
 	buf.WriteTo(w)
 }
