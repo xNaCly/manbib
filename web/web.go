@@ -107,8 +107,6 @@ func search(w http.ResponseWriter, r *http.Request) {
 	buf.WriteTo(w)
 }
 
-// TODO: do this on the fly, if a user opens the manpage, convert it to html
-// TODO: override the preview in the database, not only here
 func page(w http.ResponseWriter, r *http.Request) {
 	url, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -129,9 +127,16 @@ func page(w http.ResponseWriter, r *http.Request) {
 		cmd := exec.Command("bash", "-c", fmt.Sprintf("zcat %s | pandoc --from man --to markdown | pandoc --toc --from markdown --to html5 --template %s", p.Path, templatePath))
 		manPreview, err := cmd.Output()
 		if err != nil {
-			log.Println(err, string(manPreview), cmd.String())
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
 		}
+
 		p.Preview = string(manPreview)
+		err = database.DB.UpdatePreview(p.Path, manPreview)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
 	}
 
 	buf := &bytes.Buffer{}
