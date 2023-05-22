@@ -19,6 +19,7 @@ $body$
 
 var DEPENDENCIES = []string{
 	"pandoc",
+	"zcat",
 }
 
 func Check() {
