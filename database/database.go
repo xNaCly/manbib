@@ -48,6 +48,12 @@ func Setup() Database {
 		log.Fatalln("failed to create 'pages' table:", err)
 	}
 
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, page_id INTEGER, searched_at timestamp)")
+
+	if err != nil {
+		log.Fatalln("failed to create 'history' table:", err)
+	}
+
 	return Database{
 		Conn: db,
 	}
@@ -56,6 +62,7 @@ func Setup() Database {
 // drops the pages table
 func (d *Database) ClearDatabase() {
 	d.Conn.Exec("DROP TABLE pages")
+	d.Conn.Exec("DROP TABLE history")
 }
 
 // updates the preview of the page with the given path
