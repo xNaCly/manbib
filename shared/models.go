@@ -2,13 +2,21 @@ package shared
 
 import "time"
 
+// represents a man page in the database
 type Page struct {
-	Path        string
-	Name        string
-	Preview     string
-	Examples    string
-	History     string
-	LastUpdated time.Time
+	Id          int       // identification
+	Path        string    // source file path: /usr/share/man/man1/ls.1.gz
+	Name        string    // name of the executable: ls.1
+	Preview     string    // html preview of the man page: <h1>ls.1</h1>
+	Examples    string    // usage examples
+	History     string    // past usages
+	LastUpdated time.Time // timestamp of last indexing
+}
+
+// represents an opened man page of the past in the database
+type HistoryItem struct {
+	PageId     int
+	SearchedAt time.Time
 }
 
 // TODO: add this to the welcome page
