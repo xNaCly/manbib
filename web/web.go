@@ -146,5 +146,16 @@ func page(w http.ResponseWriter, r *http.Request) {
 
 	buf := &bytes.Buffer{}
 	err = pageTpl.Execute(buf, p)
+
+	err = database.DB.InsertHistoryItem(shared.HistoryItem{
+		PageId:     p.Id,
+		SearchedAt: time.Now(),
+	})
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
 	buf.WriteTo(w)
+	return
 }
