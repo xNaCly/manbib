@@ -33,6 +33,7 @@ type Stats struct {
 }
 
 type SearchTemplateContent struct {
+	History      []Page
 	Query        string
 	Rows         []Page
 	ResultAmount int
