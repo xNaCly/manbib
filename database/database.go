@@ -89,18 +89,19 @@ func (d *Database) InsertPages(p []shared.Page) error {
 	return err
 }
 
-// queries the database with the given name via a WHERE name LIKE  statement
-func (d *Database) GetPages(name string, limit int) []shared.Page {
-	var rows *sql.Rows
-	var err error
-	if limit < 0 {
-		limit = 1
+// inserts the given shared.HistoryItem into the database history table
+func (d *Database) InsertHistoryItem(i shared.HistoryItem) error {
+	_, err := d.Conn.Exec("INSERT INTO history (page_id, searched_at) VALUES(?, ?)", i.PageId, i.SearchedAt)
+	return err
+}
+
+// returns the 5 recent pages found in the history table
+func (d *Database) GetHistory() []shared.Page {
+	rows, err := d.Conn.Query("SELECT p.name, p.path FROM pages p INNER JOIN history h ON p.id == h.page_id ORDER BY h.searched_at DESC LIMIT 5")
+	if err != nil {
+		return []shared.Page{}
 	}
-	if len(name) != 0 {
-		rows, err = d.Conn.Query("SELECT path, name, preview, last_updated FROM pages WHERE name LIKE ? LIMIT ?", name, limit)
-	} else {
-		rows, err = d.Conn.Query("SELECT path, name, preview, last_updated FROM pages LIMIT ?", limit)
-	}
+
 	res := make([]shared.Page, 0)
 	if err != nil {
 		log.Println(err)
@@ -108,7 +109,37 @@ func (d *Database) GetPages(name string, limit int) []shared.Page {
 	}
 	for rows.Next() {
 		r := shared.Page{}
-		err = rows.Scan(&r.Path, &r.Name, &r.Preview, &r.LastUpdated)
+		err = rows.Scan(&r.Name, &r.Path)
+		if err != nil {
+			continue
+		}
+		res = append(res, r)
+	}
+	return res
+}
+
+// queries the database with the given name via a WHERE name LIKE  statement
+func (d *Database) GetPages(name string, limit int) []shared.Page {
+	var rows *sql.Rows
+	var err error
+	if limit < 0 {
+		limit = 1
+	}
+
+	if len(name) != 0 {
+		rows, err = d.Conn.Query("SELECT id, path, name, preview, last_updated FROM pages WHERE name LIKE ? LIMIT ?", name, limit)
+	} else {
+		rows, err = d.Conn.Query("SELECT id, path, name, preview, last_updated FROM pages LIMIT ?", limit)
+	}
+
+	res := make([]shared.Page, 0)
+	if err != nil {
+		log.Println(err)
+		return res
+	}
+	for rows.Next() {
+		r := shared.Page{}
+		err = rows.Scan(&r.Id, &r.Path, &r.Name, &r.Preview, &r.LastUpdated)
 		if err != nil {
 			continue
 		}
@@ -128,7 +159,7 @@ func (d *Database) GetPagesAmount() (int, error) {
 }
 
 func (d *Database) GetRandomPage() (shared.Page, error) {
-	row := d.Conn.QueryRow("SELECT path, name, preview, last_updated FROM pages ORDER BY RANDOM() LIMIT 1")
+	row := d.Conn.QueryRow("SELECT path, name FROM pages ORDER BY RANDOM() LIMIT 1")
 	r := shared.Page{}
 
 	// FIXES: errors if the result set is empty
@@ -136,7 +167,7 @@ func (d *Database) GetRandomPage() (shared.Page, error) {
 		return shared.Page{}, nil
 	}
 
-	err := row.Scan(&r.Path, &r.Name, &r.Preview, &r.LastUpdated)
+	err := row.Scan(&r.Path, &r.Name)
 	if err != nil {
 		return shared.Page{}, err
 	}
