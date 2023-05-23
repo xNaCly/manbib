@@ -21,7 +21,6 @@
         </form>
       </header>
       <div class="welcome">
-        {{ if .Total }}
         <h3>Random man-page:</h3>
         <div class="page-container">
           <div class="page">
@@ -29,6 +28,16 @@
             <small>{{ .Page.Path }}</small>
           </div>
         </div>
+        <h3>Last viewed:</h3>
+        <div class="page-container">
+          {{ range.History }}
+          <div class="page">
+            <h3><a href="/page?p={{ .Name }}">{{ .Name }}</a></h3>
+            <small>{{ .Path }}</small>
+          </div>
+          {{ end }}
+        </div>
+        {{ if .Total }}
         <div><i>Indexed {{ .Total }} man pages.</i></div>
         {{ end }}
       </div>
