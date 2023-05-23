@@ -49,19 +49,23 @@ func Run() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		history := database.DB.GetHistory()
 		buf := &bytes.Buffer{}
 		err = tpl.Execute(buf, shared.SearchTemplateContent{
-			Page:  randomPage,
-			Total: indexedAmount,
+			Page:    randomPage,
+			Total:   indexedAmount,
+			History: history,
 		})
+
 		// INFO: we ignore errors while executing the template,
 		// this keeps everything neat and simple
 		// https://open.spotify.com/track/3koCCeSaVUyrRo3N2gHrd8
 		// if err != nil {
-		// http.Error(w, err.Error(), http.StatusInternalServerError)
-		// return
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	return
 		// }
 		buf.WriteTo(w)
+		return
 	})
 	mux.HandleFunc("/page", page)
 	mux.HandleFunc("/search", search)
@@ -105,6 +109,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 	buf := &bytes.Buffer{}
 	err = searchTpl.Execute(buf, s)
 	buf.WriteTo(w)
+	return
 }
 
 func page(w http.ResponseWriter, r *http.Request) {
