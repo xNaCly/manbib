@@ -106,6 +106,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		ResultAmount: len(rows),
 		Latency:      time.Since(start).String(),
 	}
+	log.Printf("Search for '%s' took %s and had in %d results", s.Query, s.Latency, s.ResultAmount)
 	buf := &bytes.Buffer{}
 	err = searchTpl.Execute(buf, s)
 	buf.WriteTo(w)
