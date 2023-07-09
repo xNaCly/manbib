@@ -1,0 +1,21 @@
+diff --git a/web/index.html b/web/index.html
+index 10effb9..bef2ba3 100644
+--- a/web/index.html
++++ b/web/index.html
+@@ -28,6 +28,7 @@
+             <small>{{ .Page.Path }}</small>
+           </div>
+         </div>
++        {{ if .History }}
+         <h3>Last viewed:</h3>
+         <div class="page-container">
+           {{ range.History }}
+@@ -37,7 +38,7 @@
+           </div>
+           {{ end }}
+         </div>
+-        {{ if .Total }}
++        {{ end }} {{ if .Total }}
+         <div><i>Indexed {{ .Total }} man pages.</i></div>
+         {{ end }}
+       </div>
