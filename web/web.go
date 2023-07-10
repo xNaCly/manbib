@@ -32,7 +32,7 @@ var pageTpl = template.Must(template.New("page.html").Parse(pageTemplate))
 var searchTemplate string
 var searchTpl = template.Must(template.New("search.html").Parse(searchTemplate))
 
-func Run() {
+func Run(port int) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/style.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/css")
@@ -69,7 +69,7 @@ func Run() {
 	})
 	mux.HandleFunc("/page", page)
 	mux.HandleFunc("/search", search)
-	log.Fatalln(http.ListenAndServe(":10997", mux))
+	log.Fatalln(http.ListenAndServe(":"+fmt.Sprint(port), mux))
 }
 
 func search(w http.ResponseWriter, r *http.Request) {
