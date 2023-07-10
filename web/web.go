@@ -131,7 +131,7 @@ func page(w http.ResponseWriter, r *http.Request) {
 	p := page[0]
 	if len(p.Preview) == 0 {
 		start := time.Now()
-		log.Printf("page for '%s' not found, rendering page", p.Name)
+		log.Printf("rendered page '%s' not in database, rendering", p.Path)
 		cmd := exec.Command("bash", "-c", fmt.Sprintf("zcat %s | pandoc --from man --to markdown | pandoc --toc --from markdown --to html5 --template %s", p.Path, templatePath))
 		manPreview, err := cmd.Output()
 		if err != nil {
@@ -145,7 +145,7 @@ func page(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		log.Println("finished rendering, took", time.Since(start))
+		log.Println("rendering took", time.Since(start))
 	}
 
 	buf := &bytes.Buffer{}
