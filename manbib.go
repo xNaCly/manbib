@@ -1,8 +1,8 @@
 package main
 
 import (
+	"flag"
 	"log"
-	"os"
 
 	"github.com/xnacly/manbib/cli"
 	"github.com/xnacly/manbib/database"
@@ -10,30 +10,29 @@ import (
 )
 
 func main() {
+	REINDEX := flag.Bool("reindex", false, "specify to recreate the index")
+	flag.Parse()
+
 	shared.Check()
 	database.DB = database.Setup()
 	defer database.DB.Conn.Close()
 
-	if len(os.Args) == 1 {
+	if *REINDEX {
+		r, _ := database.DB.GetPagesAmount()
+		log.Printf("removing '%d' pages", r)
+		database.DB.ClearDatabase()
+		log.Println("recreating index")
+	} else {
 		// TODO: indicate index status in frontend
 		go func() {
-			// TODO: pass --reindex to app for updating index
 			if r, _ := database.DB.GetPagesAmount(); r != 0 {
 				log.Println("skipping indexing, already indexed", r, "man pages")
 				return
 			}
 			cli.Index()
 		}()
-		cli.StartWeb()
-		return
 	}
 
-	cmd := os.Args[1]
-	switch cmd {
-	case "cleardb":
-		log.Println("clearing database...")
-		database.DB.ClearDatabase()
-	default:
-		log.Fatalf("unknown instruction: '%s'", cmd)
-	}
+	cli.StartWeb()
+	return
 }

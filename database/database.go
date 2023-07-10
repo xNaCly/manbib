@@ -61,8 +61,7 @@ func Setup() Database {
 
 // drops the pages table
 func (d *Database) ClearDatabase() {
-	d.Conn.Exec("DROP TABLE pages")
-	d.Conn.Exec("DROP TABLE history")
+	d.Conn.Exec("DELETE * FROM pages")
 }
 
 // updates the preview of the page with the given path
